@@ -1,0 +1,1 @@
+insert into users (username, password) values ('user1', 'pass1')

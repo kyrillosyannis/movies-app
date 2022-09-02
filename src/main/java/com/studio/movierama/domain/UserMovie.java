@@ -1,7 +1,10 @@
 package com.studio.movierama.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -12,10 +15,13 @@ import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name = "users_movies")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserMovie {
 
     @EmbeddedId
@@ -24,13 +30,13 @@ public class UserMovie {
     @Column
     private String likeHateFlag;
 
-    @ManyToOne
-    @MapsId("userId")
-    @EqualsAndHashCode.Include
-    private User user;
-
-    @ManyToOne
-    @MapsId("movieId")
-    @EqualsAndHashCode.Include
-    private Movie movie;
+//    @ManyToOne
+//    @MapsId("userId")
+//    @EqualsAndHashCode.Include
+//    private User user;
+//
+//    @ManyToOne
+//    @MapsId("movieId")
+//    @EqualsAndHashCode.Include
+//    private Movie movie;
 }

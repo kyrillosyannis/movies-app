@@ -22,7 +22,7 @@ public class UserService {
         this.conversionService = conversionService;
     }
 
-    public UserDto register(UserDto userDto) {
+    public UserDto save(UserDto userDto) {
         log.info("Saving user");
         User user = conversionService.convert(userDto, User.class);
         try {
