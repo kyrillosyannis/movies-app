@@ -11,6 +11,7 @@ public class MovieRamaUserDetails implements UserDetails {
 
     private String username;
     private String password;
+    private Long id;
     private List<GrantedAuthority> authorities;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -21,6 +22,7 @@ public class MovieRamaUserDetails implements UserDetails {
     public MovieRamaUserDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.id = user.getId();
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
@@ -42,6 +44,10 @@ public class MovieRamaUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

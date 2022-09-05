@@ -1,5 +1,6 @@
 package com.studio.movierama.service;
 
+import com.studio.movierama.config.security.MovieRamaUserDetails;
 import com.studio.movierama.domain.Movie;
 import com.studio.movierama.domain.UserMovie;
 import com.studio.movierama.domain.UserMovieId;
@@ -15,6 +16,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -49,13 +51,53 @@ public class MovieService {
 
     public Page<MovieDto> findAll(Pageable pageable) {
         log.info("finding all movies");
+        String username = null;
+        Long userId = null;
+        MovieRamaUserDetails loggedInUser = getLoggedInUserDetails();
+        if (loggedInUser != null) {
+            username = loggedInUser.getUsername();
+            userId = loggedInUser.getId();
+        }
         Page<Movie> movies = movieRepository.findAll(pageable);
         List<MovieDto> movieDtoList = movies
                 .stream()
                 .map(movie -> conversionService.convert(movie, MovieDto.class))
                 .collect(Collectors.toList());
+        if (username != null) {
+            movieDtoList = setLoggedInUserRatings(userId, movieDtoList);
+        }
         Page<MovieDto> movieDtoPage = new PageImpl<>(movieDtoList, pageable, movies.getTotalElements());
         return movieDtoPage;
+    }
+
+    private MovieRamaUserDetails getLoggedInUserDetails() {
+        Object principal = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        if (principal instanceof MovieRamaUserDetails) {
+            return (MovieRamaUserDetails) principal;
+        }
+        return null;
+    }
+
+    private List<MovieDto> setLoggedInUserRatings(Long loggedInUserId, List<MovieDto> movies) {
+        return movies
+                .stream()
+                .map(movieDto -> {
+                    UserMovie userMovie = userMovieRepository
+                            .findById(new UserMovieId(loggedInUserId, movieDto.getId()))
+                            .orElse(null);
+                    if (userMovie != null) {
+                        if (LikeHateFlag.LIKE.getDbValue().equals(userMovie.getLikeHateFlag())) {
+                            movieDto.setLikedByUser(true);
+                        } else if (LikeHateFlag.HATE.getDbValue().equals(userMovie.getLikeHateFlag())) {
+                            movieDto.setHatedByUser(false);
+                        }
+                    }
+                    return movieDto;
+                })
+                .collect(Collectors.toList());
     }
 
     public void rate(MovieRatingRequestDto movieRatingRequestDto) {
@@ -83,6 +125,7 @@ public class MovieService {
     }
 
     private void retractRating(Long movieId, Long userId) {
+        log.info("retracting rating of user: {} for movie: {}", userId, movieId);
         userMovieRepository.deleteById(new UserMovieId(userId, movieId));
     }
 

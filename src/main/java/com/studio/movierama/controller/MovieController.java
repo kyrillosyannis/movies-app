@@ -42,12 +42,14 @@ public class MovieController {
     }
 
     @GetMapping("/movies")
-    public Page<MovieDto> findAll(@RequestParam("sortBy") String sortBy,
-                                  @RequestParam("sortDirection") String sortDirection,
-                                  @RequestParam("page") Integer page,
-                                  @RequestParam("pageSize") Integer pageSize) {
+    public Page<MovieDto> findAll(@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                  @RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection,
+                                  @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, pageSize, sort);
         return movieService.findAll(pageable);
     }
+
+    //TODO add findByUser endpoint
 }

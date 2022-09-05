@@ -1,7 +1,9 @@
 package com.studio.movierama.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
@@ -9,6 +11,8 @@ import java.time.Instant;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MovieDto {
 
     private Long id;
@@ -18,4 +22,7 @@ public class MovieDto {
     private Instant publicationDate;
     private Integer likes;
     private Integer hates;
+    private String username;
+    private boolean likedByUser;
+    private boolean hatedByUser;
 }

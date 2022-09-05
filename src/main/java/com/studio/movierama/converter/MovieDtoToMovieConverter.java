@@ -15,6 +15,7 @@ public class MovieDtoToMovieConverter implements Converter<MovieDto, Movie> {
                 .title(source.getTitle())
                 .description(source.getDescription())
                 .userId(source.getUserId())
+                .username(source.getUsername())
                 .publicationDate(source.getPublicationDate())
                 .likes(source.getLikes())
                 .hates(source.getHates())

@@ -45,4 +45,7 @@ public class Movie {
 
     @Column
     private Integer hates;
+
+    @Column
+    private String username;
 }
