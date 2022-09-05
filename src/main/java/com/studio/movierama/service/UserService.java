@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class UserService {
@@ -32,6 +34,15 @@ public class UserService {
             throw new MovieRamaException("User already exists");
         }
         userDto = conversionService.convert(user, UserDto.class);
+        return userDto;
+    }
+
+    public UserDto findByUsername(String username) {
+        log.info("find user by username");
+        Optional<User> user = userRepository.findByUsername(username);
+        UserDto userDto = user
+                .map(user1 -> conversionService.convert(user1, UserDto.class))
+                .orElse(null);
         return userDto;
     }
 }

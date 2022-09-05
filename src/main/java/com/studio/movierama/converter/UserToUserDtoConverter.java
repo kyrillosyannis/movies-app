@@ -14,7 +14,6 @@ public class UserToUserDtoConverter implements Converter<User, UserDto> {
                 .builder()
                 .id(source.getId())
                 .username(source.getUsername())
-                .password(source.getPassword())
                 .build();
         return userDto;
     }
