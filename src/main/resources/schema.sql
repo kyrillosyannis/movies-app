@@ -11,6 +11,7 @@ create table movies (
     title varchar(100),
     description varchar(300),
     user_id bigint references users(id),
+    username varchar(300),
     publication_date timestamp,
     likes int,
     hates int

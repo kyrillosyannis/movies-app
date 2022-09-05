@@ -21,15 +21,16 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    @Value("${secret}")
+    private String jwtSecret;// = "NcRfUjXn2r5u7x!A%D*G-KaPdSgVkYp3";
 
     @Value("${jwt.expirationInMs}")
     private int jwtExpirationInMs;
 
-    private Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
 
     public String generateToken(UserDetails userDetails) {
+        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
@@ -43,6 +44,7 @@ public class JwtProvider {
     }
 
     public String getUsernameFromJWT(String token) {
+        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -53,6 +55,7 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String authToken) {
+        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
