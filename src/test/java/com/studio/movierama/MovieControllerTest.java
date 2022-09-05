@@ -1,9 +1,6 @@
 package com.studio.movierama;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.studio.movierama.domain.Movie;
-import com.studio.movierama.domain.UserMovie;
-import com.studio.movierama.domain.UserMovieId;
 import com.studio.movierama.dto.MovieDto;
 import com.studio.movierama.dto.MovieRatingRequestDto;
 import com.studio.movierama.enums.LikeHateFlag;
@@ -15,10 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,13 +21,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MovieControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Test
     @WithMockUser
     public void create() throws Exception {
         MovieDto movie = MovieDto.builder().title("movie title").userId(1L).description("movie desc").build();
-        this.mockMvc.perform(post("/movies")
+        mockMvc.perform(post("/movies")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(asJsonString(movie)))
                 .andDo(print())
