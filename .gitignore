@@ -30,3 +30,4 @@ target/
 /.nb-gradle/
 build/
 /logs/
+/.idea/
