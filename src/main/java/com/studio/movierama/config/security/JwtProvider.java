@@ -19,14 +19,16 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtProvider {
-    @Value("${secret}")
-    private String jwtSecret;// = "NcRfUjXn2r5u7x!A%D*G-KaPdSgVkYp3";
+    private final SecretKey key;
 
     @Value("${jwt.expirationInMs}")
     private int jwtExpirationInMs;
 
     MacAlgorithm alg = Jwts.SIG.HS512;
-    SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+    public JwtProvider(@Value("${jwt.secret}") String jwtSecret) {
+        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
 
     public String generateToken(UserDetails userDetails) {
         Date now = new Date();
