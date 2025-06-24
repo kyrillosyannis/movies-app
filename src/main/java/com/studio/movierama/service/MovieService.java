@@ -82,11 +82,16 @@ public class MovieService {
     }
 
     private List<MovieDto> setLoggedInUserRatings(Long loggedInUserId, List<MovieDto> movies) {
-        return movies
+        List<UserMovieId> userMovieIds = movies
                 .stream()
+                .map(movieDto -> new UserMovieId(loggedInUserId, movieDto.getId()))
+                .toList();
+        List<UserMovie> userMovies = userMovieRepository.findAllById(userMovieIds);
+        return movies.stream()
                 .map(movieDto -> {
-                    UserMovie userMovie = userMovieRepository
-                            .findById(new UserMovieId(loggedInUserId, movieDto.getId()))
+                    UserMovie userMovie = userMovies.stream()
+                            .filter(userMovie1 -> userMovie1.getUserMovieId().getMovieId().equals(movieDto.getId()))
+                            .findFirst()
                             .orElse(null);
                     if (userMovie != null) {
                         if (LikeHateFlag.LIKE.getDbValue().equals(userMovie.getLikeHateFlag())) {
@@ -97,7 +102,7 @@ public class MovieService {
                     }
                     return movieDto;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void rate(MovieRatingRequestDto movieRatingRequestDto) {
@@ -121,6 +126,7 @@ public class MovieService {
     }
 
     private void like(Long movieId, Long userId) {
+        log.info("Mark movie with id: {} liked by user with id: {}", movieId, userId);
         setLikeHateFlag(movieId, userId, LikeHateFlag.LIKE);
     }
 

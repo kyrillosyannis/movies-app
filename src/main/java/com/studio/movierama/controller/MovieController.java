@@ -35,7 +35,7 @@ public class MovieController {
         return new ResponseEntity<>(movieDto, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/movies/rate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/movies/ratings", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity rate(@RequestBody MovieRatingRequestDto movieRatingRequestDto) {
         movieService.rate(movieRatingRequestDto);
         return new ResponseEntity(HttpStatus.OK);
