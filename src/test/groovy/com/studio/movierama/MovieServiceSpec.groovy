@@ -1,6 +1,8 @@
 package com.studio.movierama
 
+import com.studio.movierama.config.security.MovieRamaUserDetails
 import com.studio.movierama.domain.Movie
+import com.studio.movierama.domain.User
 import com.studio.movierama.domain.UserMovie
 import com.studio.movierama.domain.UserMovieId
 import com.studio.movierama.dto.MovieDto
@@ -10,6 +12,12 @@ import com.studio.movierama.repository.MovieRepository
 import com.studio.movierama.repository.UserMovieRepository
 import com.studio.movierama.service.MovieService
 import org.springframework.core.convert.ConversionService
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.SecurityContextImpl
 import spock.lang.Specification
 
 class MovieServiceSpec extends Specification {
@@ -83,5 +91,34 @@ class MovieServiceSpec extends Specification {
             1 * userMovieRepository.save(userMovie)
     }
 
-    //TODO add rest of the tests
+    def "find all movies with their ratings"() {
+        given: "a request from a logged in user"
+            Pageable pageable = Pageable.unpaged()
+            User user = User.builder()
+                            .id(1)
+                            .username("user")
+                            .password("pass")
+                            .build()
+            MovieRamaUserDetails movieRamaUserDetails = new MovieRamaUserDetails(user)
+            Authentication authentication = new TestingAuthenticationToken(movieRamaUserDetails, "cred")
+            SecurityContextImpl securityContext = new SecurityContextImpl(authentication)
+            SecurityContextHolder.setContext(securityContext)
+            Movie movie = Movie.builder()
+                                .id(1)
+                                .userId(2)
+                                .build()
+            UserMovieId userMovieId = new UserMovieId(2, 1)
+            UserMovie userMovie = new UserMovie(userMovieId, "L")
+            MovieDto movieDto = MovieDto.builder().userId(2).id(1).build()
+        when: "the method is called"
+            def response = movieService.findAll(pageable).content[0]
+        then: "the response contains the expected rating"
+            1 * movieRepository.findAll(pageable) >> new PageImpl<Movie>([movie])
+            1 * conversionService.convert(_, MovieDto.class) >> movieDto
+            1 * userMovieRepository.findAllById(_) >> List.of(userMovie)
+            with(response) {
+                likedByUser
+                (!hatedByUser)
+            }
+    }
 }
