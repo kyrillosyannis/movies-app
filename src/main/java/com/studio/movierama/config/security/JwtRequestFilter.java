@@ -7,6 +7,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +26,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private JwtProvider jwtProvider;
     private UserDetailsService userDetailsService;
+    private final RequestMatcher ignoredPath1 = PathPatternRequestMatcher.withDefaults().matcher("/authenticate");
+    private final RequestMatcher ignoredPath2 = PathPatternRequestMatcher.withDefaults().matcher("/register");
 
     @Autowired
     public JwtRequestFilter(JwtProvider jwtProvider, UserDetailsService userDetailsService) {
@@ -34,7 +38,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        final String requestTokenHeader = request.getHeader("Authorization");
+        if (this.ignoredPath1.matches(request) || this.ignoredPath2.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         Cookie bearerCookie = null;
         if (request.getCookies() != null) {
             bearerCookie = Arrays.stream(request.getCookies())

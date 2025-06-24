@@ -24,6 +24,9 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
@@ -31,29 +34,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/authenticate", "/register")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated())
+        http.authorizeHttpRequests(authorize -> {
+                            authorize.requestMatchers("/authenticate", "/register")
+                                    .permitAll();
+                                    authorize.anyRequest()
+                                    .authenticated();
+        })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling( exception -> exception
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-//                .antMatchers("/authenticate", "/register")
-//                .permitAll()
-//                .anyRequest()
-//                .authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .cors()
-//                .and()
-//                .csrf()
-//                .disable()//.headers().frameOptions().disable().and()
-//                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
