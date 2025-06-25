@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres/movies:/var/lib/postgresql/movies/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=movies
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  movierama:
+    image: openjdk:21
+    volumes:
+      - ./movierama-0.0.1-SNAPSHOT.jar:/app/movierama.jar
+    command: ["java", "-jar", "/app/movierama.jar"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    links:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/movies
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      
+  movierama-client:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./build:/usr/share/nginx/html
+    restart: unless-stopped  
+    links:
+      - movierama
+    environment:
+      - REACT_APP_API_URL=http://movierama:8080
+    
