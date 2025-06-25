@@ -28,6 +28,5 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
 /logs/
 /.idea/
