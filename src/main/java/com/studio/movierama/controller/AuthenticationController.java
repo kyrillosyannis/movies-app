@@ -5,7 +5,6 @@ import com.studio.movierama.dto.UserDto;
 import com.studio.movierama.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +23,7 @@ public class AuthenticationController {
 
     @PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> authenticate (@RequestBody AuthenticationRequestDto requestDto) {
+    public UserDto authenticate (@RequestBody AuthenticationRequestDto requestDto) {
         return authenticationService.authenticate(requestDto);
     }
 }

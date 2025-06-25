@@ -1,6 +1,10 @@
 package com.studio.movierama.config.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,13 +16,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -42,17 +40,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        Cookie bearerCookie = null;
-        if (request.getCookies() != null) {
-            bearerCookie = Arrays.stream(request.getCookies())
-                    .filter(cookie1 -> cookie1.getName().equals("Bearer"))
-                    .findFirst()
-                    .orElse(null);
+        String bearerToken = null;
+        if (request.getHeader("Authorization") != null) {
+            bearerToken = request.getHeader("Authorization");
+
         }
         String username = null;
         String jwt = null;
-        if (bearerCookie != null) {
-            jwt = bearerCookie.getValue();
+        if (bearerToken != null && bearerToken.startsWith("Bearer: ")) {
+            jwt = bearerToken.substring(8);
             try {
                 username = jwtProvider.getUsernameFromJWT(jwt);
             } catch (IllegalArgumentException e) {
