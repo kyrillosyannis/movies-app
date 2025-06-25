@@ -43,7 +43,7 @@ public class MovieControllerTest {
                 .userId(2L)
                 .likeHateFlag(LikeHateFlag.LIKE)
                 .build();
-        this.mockMvc.perform(post("/movies/rate")
+        this.mockMvc.perform(post("/movies/ratings")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(asJsonString(movieRatingRequestDto)))
                 .andDo(print())
